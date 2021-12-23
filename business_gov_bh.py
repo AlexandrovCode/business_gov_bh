@@ -112,7 +112,7 @@ class Handler(Extract, GetPages):
         if 'Name (Arabic)' in headers:
             loc_name = self.get_by_xpath(tree,
                                          f'//div[@class="bs_gridArea"]//tr[1]//th//text()[contains(., "Name (Arabic)")]/../../../../../..//tr//td/text()[contains(., "{company_name}")]/../../td[{headers.index("Name (Arabic)") + 1}]/text()')
-            if loc_name:
+            if loc_name and loc_name != 'N/A':
                 company['localName'] = loc_name
         if 'Website' in headers:
             url = self.get_by_xpath(tree,
@@ -122,13 +122,16 @@ class Handler(Extract, GetPages):
         if 'Email' in headers:
             email = self.get_by_xpath(tree,
                                       f'//div[@class="bs_gridArea"]//tr[1]//th//text()[contains(., "Email")]/../../../../../..//tr//td/text()[contains(., "{company_name}")]/../../td[{headers.index("Email") + 1}]/text()')
-            if email:
-                company['bst:email'] = email.split('/')[0].strip()
+            if email and email != 'N/A':
+                email = email.replace('\\', '/')
+                email = email.replace('/', ' ')
+                company['bst:email'] = email.split(' ')[0].strip()
 
         if 'Phone No.' in headers:
             phone = self.get_by_xpath(tree,
                                       f'//div[@class="bs_gridArea"]//tr[1]//th//text()[contains(., "Phone No.")]/../../../../../..//tr//td/text()[contains(., "{company_name}")]/../../td[{headers.index("Phone No.") + 1}]/text()')
-            if phone:
+            if phone and phone != 'N/A':
+                phone = phone.replace(',', '/')
                 company['tr-org:hasRegisteredPhoneNumber'] = phone.split('/')[0].strip()
         if 'Fax No.' in headers:
             fax = self.get_by_xpath(tree,
